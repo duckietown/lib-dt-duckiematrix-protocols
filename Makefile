@@ -1,7 +1,7 @@
-tag=duckietown_pondcleaner
+tag=dt_duckiematrix_protocols
 
-regular_packages=duckietown_pondcleaner
-test_packages=duckietown_pondcleaner_tests
+regular_packages=dt_duckiematrix_protocols
+test_packages=dt_duckiematrix_protocols_tests
 cover_packages=$(test_packages),$(regular_packages)
 
 
@@ -78,7 +78,7 @@ run:
 
 run-with-mounted-src:
 	mkdir -p out-docker
-	docker run -it -v $(PWD)/src:/duckietown_pondcleaner/src:ro -v $(PWD)/out-docker:/out $(tag) dt-pc-demo
+	docker run -it -v $(PWD)/src:/dt_duckiematrix_protocols/src:ro -v $(PWD)/out-docker:/out $(tag) dt-pc-demo
 
 
 coverage-report:
@@ -99,12 +99,7 @@ bump: # v2
 	git push --tags
 	git push
 
-upload: # v3
-	dts build_utils check-not-dirty
-	dts build_utils check-tagged
-	dts build_utils check-need-upload --package duckietown-pondcleaner-ente make upload-do
-
-upload-do:
+upload:
 	rm -f dist/*
 	rm -rf src/*.egg-info
 	python3 setup.py sdist

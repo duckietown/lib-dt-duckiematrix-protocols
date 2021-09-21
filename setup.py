@@ -3,13 +3,14 @@ from setuptools import find_packages, setup
 # :==> Fill in your project data here
 # The package name is the name on PyPI
 # it is not the python module names.
-package_name = 'dt-pondcleaner'
-library_webpage = 'http://github.com/duckietown/template-library'
-maintainer = 'Mack'
-maintainer_email = 'admin@duckietown.org'
-short_description = 'A short description'
+distro = "ente"
+package_name = 'dt-duckiematrix-protocols'
+library_webpage = 'http://github.com/duckietown/lib-dt-duckiematrix-protocols'
+maintainer = 'Andrea F. Daniele'
+maintainer_email = 'afdaniele@duckietown.com'
+short_description = 'Protocol messages used to communicate with the duckiematrix engine.'
 full_description = """
-A longer description.
+Protocol messages used to communicate with the duckiematrix engine.
 """
 
 # Read version from the __init__ file
@@ -28,7 +29,7 @@ def get_version_from_source(filename):
         raise ValueError(filename)
     return version
 
-version = get_version_from_source('src/duckietown_pondcleaner/__init__.py')
+version = get_version_from_source('src/dt_duckiematrix_protocols/__init__.py')
 
 # read project dependencies
 # NO - dependencies.txt is for testing dependiences - EVERYTHING PINNED
@@ -49,12 +50,9 @@ description = """
 {long}
 """.format(name=package_name, short=short_description, long=full_description, underline=underline)
 
-console_scripts = [
-    "dt-pc-demo = duckietown_pondcleaner:dt_pc_demo",
-]
 # setup package
 setup(
-    name=package_name,
+    name=f"{package_name}-{distro}",
     author=maintainer,
     author_email=maintainer_email,
     url=library_webpage,
@@ -63,6 +61,5 @@ setup(
     package_dir={"": "src"},
     packages=find_packages('./src'),
     long_description=description,
-    version=version,
-    entry_points={"console_scripts": console_scripts},
+    version=version
 )
