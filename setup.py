@@ -59,7 +59,10 @@ setup(
     tests_require=tests_require,
     install_requires=install_requires,
     package_dir={"": "src"},
-    packages=find_packages('./src'),
+    packages=find_packages(
+        './src',
+        exclude=("dt_duckiematrix_protocols_tests",)
+    ),
     long_description=description,
     version=version
 )
