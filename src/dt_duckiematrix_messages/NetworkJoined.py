@@ -3,7 +3,7 @@ from typing import Dict
 
 from dt_duckiematrix_messages import CBorMessage
 from dt_duckiematrix_messages.NetworkEndpoint import NetworkEndpoint
-from dt_duckiematrix_protocols.types import EngineMode
+from dt_duckiematrix_types import EngineMode
 
 
 @dataclasses.dataclass
