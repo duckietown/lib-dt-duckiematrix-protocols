@@ -1,5 +1,5 @@
 from threading import Semaphore
-from typing import Dict, List, TypeVar, Type
+from typing import Dict, List, TypeVar, Type, Optional
 
 import numpy as np
 
@@ -21,10 +21,18 @@ T = TypeVar('T')
 
 class MarkersManager:
 
-    def __init__(self, layers: LayerProtocol, auto_commit: bool = False):
+    def __init__(self, engine_hostname: str, auto_commit: bool = False,
+                 layer_protocol: Optional[LayerProtocol] = None):
         self._markers: Dict[str, MarkerAbs] = {}
         self._markers_actions: Dict[str, MarkerAction] = {}
-        self._layers = layers
+
+        # protocols
+        self._layer_protocol: Optional[LayerProtocol] = None
+        if layer_protocol is not None:
+            self._layer_protocol = layer_protocol
+        else:
+            self._layer_protocol: LayerProtocol = LayerProtocol(engine_hostname, auto_commit)
+
         self._auto_commit = auto_commit
         self._lock = Semaphore(1)
 
@@ -37,7 +45,7 @@ class MarkersManager:
         with self._lock:
             self._markers[key] = marker
             self._markers_actions[key] = MarkerAction.ADD_OR_UPDATE
-            self._layers.update("markers", key, marker.as_dict())
+            self._layer_protocol.update("markers", key, marker.as_dict())
 
     def _remove(self, key: str):
         with self._lock:
@@ -46,10 +54,10 @@ class MarkersManager:
                 return
             # a marker with the given key existed, propagate a remove
             self._markers_actions[key] = MarkerAction.REMOVE
-            self._layers.update("markers", key, marker.as_dict())
+            self._layer_protocol.update("markers", key, marker.as_dict())
 
     def _make_pose(self, key: str, auto_commit: bool = False, **kwargs) -> Pose3D:
-        return Pose3D(self._layers, key, auto_commit, **kwargs)
+        return Pose3D(self._layer_protocol, key, auto_commit, **kwargs)
 
     @staticmethod
     def _make_scale(auto_commit: bool = False, **kwargs) -> List[float]:
@@ -95,7 +103,7 @@ class MarkersManager:
 
     def _make_marker(self, key: str, factory: Type[T], **kwargs) -> T:
         auto_commit: bool = self._auto_commit
-        marker = factory(self._layers, key, auto_commit)
+        marker = factory(self._layer_protocol, key, auto_commit)
         # pose
         pose = self._make_pose(key, auto_commit, **kwargs)
         if pose is not None:

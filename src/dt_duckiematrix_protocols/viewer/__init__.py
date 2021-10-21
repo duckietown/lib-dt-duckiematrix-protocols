@@ -1,4 +1,3 @@
-from .ViewerProtocol import ViewerProtocol
 from .markers import \
     MarkerCube, \
     MarkerSphere, \

@@ -3,7 +3,7 @@ from typing import Optional, Dict, Set, Union, List
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
-from dt_duckiematrix_protocols.robot.RobotProtocolAbs import RobotProtocolAbs
+from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.features.sensors import Camera
 from dt_duckiematrix_protocols.robot.features.motion import DifferentialDrive, \
     DifferentialDriveWheels
@@ -219,6 +219,8 @@ class WT18(WT1XRobot):
 
 
 __all__ = [
+    RobotFeature,
+    RobotAbs,
     DB21M,
     DB21J,
     DB21R,
@@ -228,5 +230,7 @@ __all__ = [
     WT21B,
     WT19A,
     WT19B,
-    WT18
+    WT18,
+    CameraEnabledRobot,
+    WheeledRobot
 ]

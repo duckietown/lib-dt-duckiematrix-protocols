@@ -11,7 +11,7 @@ from dt_duckiematrix_messages.NetworkJoined import NetworkJoined
 from dt_duckiematrix_protocols.commons.socket import \
     DuckieMatrixEngineDataSocket, \
     DuckieMatrixEngineControlSocket
-from dt_duckiematrix_protocols.types import NetworkRole
+from dt_duckiematrix_types import NetworkRole, EngineMode
 from dt_duckiematrix_protocols.utils.communication import compile_topic, parse_topic
 
 
@@ -72,6 +72,14 @@ class ProtocolAbs(ABC):
         if protocol == "network":
             if answer == "joined":
                 network_desc = NetworkJoined.from_bytes(data)
+                # validate engine mode
+                if not self.validate_engine_mode(network_desc.mode):
+                    self._logger.error("The Engine you connected to is running in "
+                                       f"{network_desc.mode.name} mode, but the protocol you "
+                                       f"instantiated does not support it. You need to use "
+                                       f"the correct protocol.")
+                    return None
+                # ---
                 return network_desc.endpoints
             else:
                 self._logger.error(f"The engine replied to 'network/join' with '{topic}'.")
@@ -82,4 +90,8 @@ class ProtocolAbs(ABC):
 
     @abstractmethod
     def commit(self):
+        pass
+
+    @abstractmethod
+    def validate_engine_mode(self, mode: EngineMode) -> bool:
         pass

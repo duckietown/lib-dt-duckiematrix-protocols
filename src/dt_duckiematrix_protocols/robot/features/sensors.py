@@ -6,7 +6,7 @@ from typing import Optional, TypeVar, Generic, Callable, Set
 from dt_duckiematrix_messages.CameraFrame import CameraFrame
 from dt_duckiematrix_messages.TimeOfFlightRange import TimeOfFlightRange
 from dt_duckiematrix_messages.WheelEncoderTicks import WheelEncoderTicks
-from dt_duckiematrix_protocols.robot.RobotProtocolAbs import RobotProtocolAbs
+from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.utils.MonitoredCondition import MonitoredCondition
 
 

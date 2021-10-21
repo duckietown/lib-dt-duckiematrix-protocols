@@ -1,4 +1,5 @@
 import logging
+from abc import ABC
 from collections import defaultdict
 from threading import Semaphore
 from typing import Dict, List, Callable
@@ -7,7 +8,7 @@ from dt_duckiematrix_messages import CBorMessage
 from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
 
 
-class CBORProtocol(ProtocolAbs):
+class CBORProtocol(ProtocolAbs, ABC):
 
     def __init__(self, engine_hostname: str, group: str, auto_commit: bool = False):
         super(CBORProtocol, self).__init__(engine_hostname, group)

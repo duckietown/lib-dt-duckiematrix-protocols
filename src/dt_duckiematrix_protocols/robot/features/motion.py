@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 from dt_duckiematrix_messages.WheelsCommand import WheelsCommand
-from dt_duckiematrix_protocols.robot.RobotProtocolAbs import RobotProtocolAbs
+from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.features.sensors import WheelEncoder
 
 
@@ -25,7 +25,7 @@ class Wheel:
     def __init__(self, protocol: RobotProtocolAbs, key: str, name: str, encoder: bool = False):
         self._key = key
         self._name = name
-        self._frame_key = os.path.join(self._key, f"wheel_{name}")
+        self._protocol = protocol
         self._encoder_key = os.path.join(self._key, f"wheel_encoder_{name}")
         self._encoder = WheelEncoder(protocol, self._encoder_key) if encoder else None
 
@@ -49,3 +49,9 @@ class DifferentialDriveWheels:
     @property
     def right(self) -> Wheel:
         return self._right_wheel
+
+    def get(self, wheel_name: str) -> Wheel:
+        return {
+            "left": self._left_wheel,
+            "right": self._right_wheel,
+        }[wheel_name]

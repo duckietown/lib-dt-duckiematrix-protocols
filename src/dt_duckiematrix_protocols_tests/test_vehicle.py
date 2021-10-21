@@ -1,8 +1,6 @@
 import time
 
-from dt_duckiematrix_protocols import ViewerProtocol
-from dt_duckiematrix_protocols.robot.RealtimeRobotProtocol import RealtimeRobotProtocol
-from dt_duckiematrix_protocols.world.Matrix import Matrix
+from dt_duckiematrix_protocols import Matrix
 
 matrix = Matrix(
     "localhost",

@@ -5,6 +5,7 @@ from typing import Dict, Set, Any
 
 from dt_duckiematrix_messages.LayerMessage import LayerMessage
 from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
+from dt_duckiematrix_types import EngineMode
 
 
 class LayerProtocol(ProtocolAbs):
@@ -54,3 +55,6 @@ class LayerProtocol(ProtocolAbs):
         # ---
         if lock:
             self._lock.release()
+
+    def validate_engine_mode(self, mode: EngineMode) -> bool:
+        return True

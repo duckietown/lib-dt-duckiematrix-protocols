@@ -1,9 +1,10 @@
 from threading import Semaphore
-from typing import Dict, Type, TypeVar, Optional, Set
+from typing import Dict, Type, TypeVar, Optional, Set, Callable
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
-from dt_duckiematrix_protocols.robot.RobotProtocolAbs import RobotProtocolAbs
-from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature
+from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol
+from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature, DB21R, DB21J, \
+    WT18, WT19B, WT19A, WT21B, WT21A, DB18, DB19, CameraEnabledRobot, WheeledRobot
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
 T = TypeVar("T")
@@ -11,12 +12,39 @@ T = TypeVar("T")
 
 class RobotsManager:
 
-    def __init__(self, robot_protocol: RobotProtocolAbs,
+    def __init__(self, engine_hostname: str, auto_commit: bool = False,
+                 robot_protocol: Optional[RealtimeRobotProtocol] = None,
                  layer_protocol: Optional[LayerProtocol] = None):
         self._robots: Dict[str, RobotAbs] = {}
-        self._robot_protocol = robot_protocol
-        self._layer_protocol = layer_protocol
-        self._lock = Semaphore(1)
+        # protocols
+        self._robot_protocol: Optional[RealtimeRobotProtocol] = None
+        self._layer_protocol: Optional[LayerProtocol] = None
+        # robot protocol
+        if robot_protocol is not None:
+            self._robot_protocol = robot_protocol
+        else:
+            self._robot_protocol: RealtimeRobotProtocol = RealtimeRobotProtocol(engine_hostname,
+                                                                                auto_commit)
+        # layer protocol
+        if layer_protocol is not None:
+            self._layer_protocol = layer_protocol
+        else:
+            self._layer_protocol: LayerProtocol = LayerProtocol(engine_hostname, auto_commit)
+        # robots by name
+        self._robots_makers: Dict[str, Callable[[str, ...], RobotAbs]] = {
+            "DB21M": self.DB21M,
+            "DB21J": self.DB21J,
+            "DB21R": self.DB21R,
+            "DB19": self.DB19,
+            "DB18": self.DB18,
+            "WT21A": self.WT21A,
+            "WT21B": self.WT21B,
+            "WT19A": self.WT19A,
+            "WT19B": self.WT19B,
+            "WT18": self.WT18,
+        }
+        # ---
+        self._lock = Semaphore()
 
     def _add(self, key: str, robot: RobotAbs):
         # add new robot
@@ -37,6 +65,12 @@ class RobotsManager:
         # ---
         return robot
 
+    def create(self, model: str, key: str, **kwargs):
+        if model not in self._robots_makers:
+            raise ValueError(f"Model '{model}' not recognized.")
+        maker = self._robots_makers[model]
+        return maker(key, **kwargs)
+
     def DB21M(self, key: str, **kwargs) -> DB21M:
         features: Set[RobotFeature] = {
             RobotFeature.DIFFERENTIAL_DRIVE,
@@ -45,3 +79,86 @@ class RobotsManager:
             RobotFeature.ENCODER_RIGHT,
         }
         return self._make_robot(key, DB21M, features, **kwargs)
+
+    def DB21J(self, key: str, **kwargs) -> DB21J:
+        features: Set[RobotFeature] = {
+            RobotFeature.DIFFERENTIAL_DRIVE,
+            RobotFeature.CAMERA_0,
+            RobotFeature.ENCODER_LEFT,
+            RobotFeature.ENCODER_RIGHT,
+        }
+        return self._make_robot(key, DB21J, features, **kwargs)
+
+    def DB21R(self, key: str, **kwargs) -> DB21R:
+        features: Set[RobotFeature] = {
+            RobotFeature.DIFFERENTIAL_DRIVE,
+            RobotFeature.CAMERA_0,
+            RobotFeature.ENCODER_LEFT,
+            RobotFeature.ENCODER_RIGHT,
+        }
+        return self._make_robot(key, DB21R, features, **kwargs)
+
+    def DB19(self, key: str, **kwargs) -> DB19:
+        features: Set[RobotFeature] = {
+            RobotFeature.DIFFERENTIAL_DRIVE,
+            RobotFeature.CAMERA_0,
+            RobotFeature.ENCODER_LEFT,
+            RobotFeature.ENCODER_RIGHT,
+        }
+        return self._make_robot(key, DB19, features, **kwargs)
+
+    def DB18(self, key: str, **kwargs) -> DB18:
+        features: Set[RobotFeature] = {
+            RobotFeature.DIFFERENTIAL_DRIVE,
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, DB18, features, **kwargs)
+
+    def WT21A(self, key: str, **kwargs) -> WT21A:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0
+        }
+        return self._make_robot(key, WT21A, features, **kwargs)
+
+    def WT21B(self, key: str, **kwargs) -> WT21B:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, WT21B, features, **kwargs)
+
+    def WT19A(self, key: str, **kwargs) -> WT19A:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, WT19A, features, **kwargs)
+
+    def WT19B(self, key: str, **kwargs) -> WT19B:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, WT19B, features, **kwargs)
+
+    def WT18(self, key: str, **kwargs) -> WT18:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, WT18, features, **kwargs)
+
+    # Generic Types
+
+    def CameraEnabledRobot(self, key: str, **kwargs) -> CameraEnabledRobot:
+        features: Set[RobotFeature] = {
+            RobotFeature.CAMERA_0,
+        }
+        return self._make_robot(key, CameraEnabledRobot, features, **kwargs)
+
+    def WheeledRobot(self, key: str, encoders: bool, **kwargs) -> WheeledRobot:
+        features: Set[RobotFeature] = {
+            RobotFeature.DIFFERENTIAL_DRIVE,
+        }
+        if encoders:
+            features.update({
+                RobotFeature.ENCODER_LEFT,
+                RobotFeature.ENCODER_RIGHT,
+            })
+        return self._make_robot(key, WheeledRobot, features, **kwargs)
