@@ -3,6 +3,7 @@ from .markers import \
     MarkerSphere, \
     MarkerCylinder, \
     MarkerQuad, \
+    MarkerCone, \
     MarkerArrow, \
     MarkerText, \
     MarkerTrajectory

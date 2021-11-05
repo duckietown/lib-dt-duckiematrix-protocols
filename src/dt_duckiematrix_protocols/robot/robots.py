@@ -7,6 +7,7 @@ from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.features.sensors import Camera
 from dt_duckiematrix_protocols.robot.features.motion import DifferentialDrive, \
     DifferentialDriveWheels
+from dt_duckiematrix_protocols.types.geometry import IPose3D
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
 
@@ -84,7 +85,7 @@ class RobotAbs:
         }
         # fields
         # - pose
-        self._pose: Optional[Pose3D] = None
+        self._pose: Optional[IPose3D] = None
         if RobotFeature.FRAME in features:
             self._assert_protocols(RobotFeature.FRAME, ["layer"])
             self._pose = Pose3D(self._protocol("layer"), key)
@@ -107,11 +108,11 @@ class RobotAbs:
             encoder_right: bool = RobotFeature.ENCODER_RIGHT in features
             self._wheels = DifferentialDriveWheels(robot_proto, key, encoder_left, encoder_right)
 
-    def session(self) -> ProtocolAbs.ProtocolContext:
+    def session(self) -> ProtocolAbs.SessionProtocolContext:
         return self._protocol("robot").session()
 
     @property
-    def pose(self) -> Pose3D:
+    def pose(self) -> IPose3D:
         return self._pose
 
     def _protocol(self, name: str):

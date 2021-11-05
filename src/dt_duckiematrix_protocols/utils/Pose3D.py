@@ -3,6 +3,7 @@ from typing import Any, Optional
 import numpy as np
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
+from dt_duckiematrix_protocols.types.geometry import IPose3D
 from dt_duckiematrix_protocols.utils.MonitoredObject import MonitoredObject
 
 BUILTIN_TYPES = (
@@ -18,10 +19,9 @@ BUILTIN_TYPES = (
 )
 
 
-class Pose3D(MonitoredObject):
+class Pose3D(MonitoredObject, IPose3D):
 
     EMPTY_DICT = {}
-    POSE_ATTRS = ["x", "y", "z", "roll", "pitch", "yaw"]
 
     def __init__(self, layers: LayerProtocol, key: str, auto_commit: bool = False, **kwargs):
         super(Pose3D, self).__init__(auto_commit)
@@ -29,7 +29,7 @@ class Pose3D(MonitoredObject):
         self._key = key
         # make frame if it does not exist
         if not self._layers.has("frames", self._key):
-            self._layers.update("frames", self._key, {
+            self._layers.update_quiet("frames", self._key, {
                 "relative_to": None,
                 "pose": {k: 0.0 for k in self.POSE_ATTRS}
             })
@@ -44,7 +44,7 @@ class Pose3D(MonitoredObject):
     def _get_property(self, field: str) -> float:
         return self._layers.get("frames", self._key).get("pose").get(field, None)
 
-    def _set_property(self, field: str, value: Any):
+    def _set_property(self, field: str, value: Any, quiet: bool = False):
         # make sure the value is YAML-serializable
         if value is not None and value.__class__ not in BUILTIN_TYPES:
             # Numpy float values
@@ -60,60 +60,12 @@ class Pose3D(MonitoredObject):
                 return
         pose = self._layers.get("frames", self._key)
         pose["pose"][field] = value
-        if self._auto_commit:
+        if self._auto_commit and not quiet:
             self._commit()
 
     def _commit(self):
         pose = self._layers.get("frames", self._key)
         self._layers.update("frames", self._key, pose)
-
-    @property
-    def x(self) -> float:
-        return self._get_property("x")
-
-    @x.setter
-    def x(self, value):
-        self._set_property("x", value)
-
-    @property
-    def y(self) -> float:
-        return self._get_property("y")
-
-    @y.setter
-    def y(self, value):
-        self._set_property("y", value)
-
-    @property
-    def z(self) -> float:
-        return self._get_property("z")
-
-    @z.setter
-    def z(self, value):
-        self._set_property("z", value)
-
-    @property
-    def roll(self) -> float:
-        return self._get_property("roll")
-
-    @roll.setter
-    def roll(self, value):
-        self._set_property("roll", value)
-
-    @property
-    def pitch(self) -> float:
-        return self._get_property("pitch")
-
-    @pitch.setter
-    def pitch(self, value):
-        self._set_property("pitch", value)
-
-    @property
-    def yaw(self) -> float:
-        return self._get_property("yaw")
-
-    @yaw.setter
-    def yaw(self, value):
-        self._set_property("yaw", value)
 
     @property
     def relative_to(self) -> Optional[str]:
@@ -123,8 +75,10 @@ class Pose3D(MonitoredObject):
     def relative_to(self, value):
         self._layers.get("frames", self._key)["relative_to"] = value
 
-    def __str__(self):
-        return str({
-            "relative_to": self.relative_to,
-            "pose": {k: self._get_property(k) for k in self.POSE_ATTRS}
-        })
+    def update(self, other: IPose3D, quiet: bool = False):
+        if not isinstance(other, IPose3D):
+            raise ValueError(f"Expected 'IPose3D', got '{type(other).__name__}' instead.")
+        ctx = self.quiet if quiet else self.atomic
+        with ctx():
+            for k in self.POSE_ATTRS:
+                self._set_property(k, other._get_property(k))

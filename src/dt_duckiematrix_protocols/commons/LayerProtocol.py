@@ -1,4 +1,3 @@
-import logging
 from collections import defaultdict
 from threading import Semaphore
 from typing import Dict, Set, Any
@@ -11,12 +10,10 @@ from dt_duckiematrix_types import EngineMode
 class LayerProtocol(ProtocolAbs):
 
     def __init__(self, engine_hostname: str, auto_commit: bool = False):
-        super(LayerProtocol, self).__init__(engine_hostname, "layer")
+        super(LayerProtocol, self).__init__(engine_hostname, "layer", auto_commit)
         self._layers: Dict[str, Dict[str, dict]] = defaultdict(dict)
         self._layers_updates: Dict[str, Set[str]] = defaultdict(set)
-        self._auto_commit = auto_commit
         self._lock = Semaphore(1)
-        self.logger = logging.getLogger("LayerProtocol")
 
     def has(self, layer: str, key: str):
         return key in self._layers[layer]
@@ -25,18 +22,23 @@ class LayerProtocol(ProtocolAbs):
         return self._layers[layer].get(key, None)
 
     def set_quiet(self, layer: str, key: str, field: str, data: Any):
-        if key not in self._layers[layer]:
-            self._layers[layer][key] = {}
-        self._layers[layer][key][field] = data
+        with self._lock:
+            if key not in self._layers[layer]:
+                self._layers[layer][key] = {}
+            self._layers[layer][key][field] = data
+            self._layers_updates[layer].add(key)
 
-    def update(self, layer: str, key: str, data: dict):
+    def update_quiet(self, layer: str, key: str, data: dict):
+        self.update(layer, key, data, quiet=True)
+
+    def update(self, layer: str, key: str, data: dict, quiet: bool = False):
         with self._lock:
             if key not in self._layers[layer]:
                 self._layers[layer][key] = {}
             self._layers[layer][key].update(data)
             self._layers_updates[layer].add(key)
             # auto-commit?
-            if self._auto_commit:
+            if self._auto_commit and not quiet:
                 self.commit(lock=False)
 
     def commit(self, lock: bool = True):

@@ -17,11 +17,12 @@ from dt_duckiematrix_protocols.utils.communication import compile_topic, parse_t
 
 class ProtocolAbs(ABC):
 
-    class ProtocolContext:
+    class SessionProtocolContext:
 
         def __init__(self, protocol: 'ProtocolAbs'):
             self._protocol = protocol
             self._counter = 0
+            self._auto_commit = self._protocol.auto_commit
             self._lock = Semaphore()
 
         def __enter__(self):
@@ -31,12 +32,27 @@ class ProtocolAbs(ABC):
         def __exit__(self, exc_type, exc_val, exc_tb):
             with self._lock:
                 self._counter -= 1
-                commit = self._counter == 0
+                commit = self._auto_commit and (self._counter == 0)
             if commit:
                 self._protocol.commit()
 
-    def __init__(self, engine_hostname: str, group: str):
+    class AtomicProtocolContext:
+
+        def __init__(self, protocol: 'ProtocolAbs'):
+            self._protocol = protocol
+            self._auto_commit = protocol.auto_commit
+
+        def __enter__(self):
+            self._protocol.auto_commit = False
+            self._protocol._context.__enter__()
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self._protocol._context.__exit__(exc_type, exc_val, exc_tb)
+            self._protocol.auto_commit = self._auto_commit
+
+    def __init__(self, engine_hostname: str, group: str, auto_commit: bool):
         self._logger = logging.getLogger(f"Protocol[{group}]")
+        self._auto_commit = auto_commit
         self._ctl_socket = DuckieMatrixEngineControlSocket(engine_hostname)
         self._group = group
         # join network
@@ -56,7 +72,15 @@ class ProtocolAbs(ABC):
         )
         self._socket.start()
         # ---
-        self._context = ProtocolAbs.ProtocolContext(self)
+        self._context = ProtocolAbs.SessionProtocolContext(self)
+
+    @property
+    def auto_commit(self) -> bool:
+        return self._auto_commit
+
+    @auto_commit.setter
+    def auto_commit(self, value: bool):
+        self._auto_commit = value
 
     def _join_network(self) -> Optional[Dict[str, NetworkEndpoint]]:
         topic, data = self._ctl_socket.request(
@@ -85,8 +109,11 @@ class ProtocolAbs(ABC):
                 self._logger.error(f"The engine replied to 'network/join' with '{topic}'.")
         return None
 
-    def session(self) -> ProtocolContext:
+    def session(self) -> SessionProtocolContext:
         return self._context
+
+    def atomic(self) -> AtomicProtocolContext:
+        return ProtocolAbs.AtomicProtocolContext(self)
 
     @abstractmethod
     def commit(self):

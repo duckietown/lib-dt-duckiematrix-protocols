@@ -11,9 +11,8 @@ from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
 class CBORProtocol(ProtocolAbs, ABC):
 
     def __init__(self, engine_hostname: str, group: str, auto_commit: bool = False):
-        super(CBORProtocol, self).__init__(engine_hostname, group)
+        super(CBORProtocol, self).__init__(engine_hostname, group, auto_commit)
         self._messages: Dict[str, List[CBorMessage]] = defaultdict(list)
-        self._auto_commit = auto_commit
         self._lock = Semaphore()
         self._logger = logging.getLogger(f"CBORProtocol[{group}]")
 

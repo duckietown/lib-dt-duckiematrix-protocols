@@ -9,7 +9,7 @@ matrix = Matrix(
 
 time.sleep(1)
 
-robot = matrix.robots.DB21M("map_0/vehicle_0", raw_pose=True)
+robot = matrix.robots.DB21M("vautobot00", raw_pose=True)
 
 speed = 1.0
 drive_for_num_steps = 0
@@ -20,7 +20,3 @@ for _ in range(drive_for_num_steps):
     with robot.session():
         robot.drive(-speed, speed)
     time.sleep(1 / 60.0)
-
-
-
-# matrix._robot_protocol.commit()

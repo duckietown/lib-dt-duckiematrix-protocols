@@ -58,7 +58,7 @@ class DuckieMatrixEngineDataSocket(DuckieMatrixEngineSocketAbs):
                 socket.connect(out_uri)
                 self._out_socket = socket
                 self._logger.info(f"Link to DATA OUT connector for group '{group}' established "
-                                  f"at {in_uri}.")
+                                  f"at {out_uri}.")
             except BaseException as e:
                 self._logger.error(str(e))
         # ---
@@ -145,11 +145,12 @@ class DuckieMatrixEngineDataSocket(DuckieMatrixEngineSocketAbs):
         key_raw = key.encode("ascii")
         message_raw = message.to_bytes()
         self._out_socket.send_multipart([key_raw, message_raw])
-        print(f"PUBLISH: [{key}]: {message_raw}")
+
+        # TODO: remove
+        print(f"PUBLISH: [{key}]: {message}")
 
     def run(self) -> None:
         if self._in_socket is None:
-            self._logger.info("EXITING")
             return
         # ---
         while not self.is_shutdown:
