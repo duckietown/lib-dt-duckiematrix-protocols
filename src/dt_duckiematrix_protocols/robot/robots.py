@@ -41,6 +41,8 @@ from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 # WS21A = 70
 # WS21B = 71
 # WS21C = 72
+# # Duckiecam
+# DC21 = 80
 
 
 class RobotFeature(Enum):
@@ -219,6 +221,20 @@ class WT18(WT1XRobot):
     pass
 
 
+# DC - Duckiecam
+
+class DCRobot(CameraEnabledRobot):
+    pass
+
+
+class DC2XRobot(DCRobot):
+    pass
+
+
+class DC21(DC2XRobot):
+    pass
+
+
 __all__ = [
     RobotFeature,
     RobotAbs,
@@ -232,6 +248,7 @@ __all__ = [
     WT19A,
     WT19B,
     WT18,
+    DC21,
     CameraEnabledRobot,
     WheeledRobot
 ]
