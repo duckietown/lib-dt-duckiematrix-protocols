@@ -78,6 +78,7 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
+            RobotFeature.TOF_FRONT_CENTER
         }
         return self._make_robot(key, DB21M, features, **kwargs)
 
@@ -87,6 +88,7 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
+            RobotFeature.TOF_FRONT_CENTER
         }
         return self._make_robot(key, DB21J, features, **kwargs)
 
@@ -96,6 +98,7 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
+            RobotFeature.TOF_FRONT_CENTER
         }
         return self._make_robot(key, DB21R, features, **kwargs)
 
