@@ -16,13 +16,6 @@ class CBORProtocol(ProtocolAbs, ABC):
         self._lock = Semaphore()
         self._logger = logging.getLogger(f"CBORProtocol[{group}]")
 
-    @property
-    def connected(self) -> bool:
-        return self._socket.connected
-
-    def wait_until_connected(self):
-        return self._socket.wait_until_connected()
-
     def publish(self, key: str, message: CBorMessage):
         with self._lock:
             self._messages[key].append(message)

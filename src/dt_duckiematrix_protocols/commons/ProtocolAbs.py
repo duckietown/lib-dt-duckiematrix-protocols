@@ -75,6 +75,13 @@ class ProtocolAbs(ABC):
         self._context = ProtocolAbs.SessionProtocolContext(self)
 
     @property
+    def connected(self) -> bool:
+        return self._socket.connected
+
+    def wait_until_connected(self):
+        return self._socket.wait_until_connected()
+
+    @property
     def auto_commit(self) -> bool:
         return self._auto_commit
 
