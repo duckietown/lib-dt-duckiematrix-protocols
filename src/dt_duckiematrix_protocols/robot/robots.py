@@ -236,19 +236,27 @@ class DC21(DC2XRobot):
 
 
 __all__ = [
-    RobotFeature,
-    RobotAbs,
-    DB21M,
-    DB21J,
-    DB21R,
-    DB19,
-    DB18,
-    WT21A,
-    WT21B,
-    WT19A,
-    WT19B,
-    WT18,
-    DC21,
-    CameraEnabledRobot,
-    WheeledRobot
+    "RobotFeature",
+    "RobotAbs",
+    # Duckiebots
+    "DBRobot",
+    "DB21M",
+    "DB21J",
+    "DB21R",
+    "DB19",
+    "DB18",
+    # Watchtowers
+    "WTRobot",
+    "WT21A",
+    "WT21B",
+    "WT19A",
+    "WT19B",
+    "WT18",
+    # Duckiecams
+    "DCRobot",
+    "DC21",
+    # Generic Robots
+    "CameraEnabledRobot",
+    "WheeledRobot",
+    "DifferentialDriveWheels"
 ]
