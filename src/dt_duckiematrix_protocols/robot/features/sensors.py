@@ -19,6 +19,7 @@ class SensorAbs(Generic[T], ABC):
         self._protocol = protocol
         self._key = key
         self._msg_type = msg_type
+        self._enabled: bool = True
         self._reading: T = None
         self._reading_used: bool = False
         self._lock = Semaphore()
@@ -32,6 +33,8 @@ class SensorAbs(Generic[T], ABC):
         return self._reading
 
     def _on_new_reading(self, msg: T):
+        if not self._enabled:
+            return
         with self._lock:
             self._reading = msg
             self._reading_used = True
@@ -66,9 +69,20 @@ class SensorAbs(Generic[T], ABC):
                     return None
                 return self._grab_current()
 
+    def start(self):
+        self._enabled = True
+
+    def stop(self):
+        self._enabled = False
+
     def attach(self, callback: Callable[[T], None]):
         with self._lock:
             self._callbacks.add(callback)
+
+    def detach(self, callback: Callable[[T], None]):
+        with self._lock:
+            if callback in self._callbacks:
+                self._callbacks.remove(callback)
 
 
 class Camera(SensorAbs[CameraFrame]):
