@@ -4,7 +4,7 @@ from typing import Optional, Dict, Set, Union, List
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
 from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
-from dt_duckiematrix_protocols.robot.features.sensors import Camera
+from dt_duckiematrix_protocols.robot.features.sensors import Camera, TimeOfFlight
 from dt_duckiematrix_protocols.robot.features.motion import DifferentialDrive, \
     DifferentialDriveWheels
 from dt_duckiematrix_protocols.types.geometry import IPose3D
@@ -105,7 +105,7 @@ class RobotAbs:
             self._camera_0 = Camera(self._protocol("robot"), camera_0_key)
         # - wheels
         self._wheels: Optional[DifferentialDriveWheels] = None
-        if RobotFeature.DIFFERENTIAL_DRIVE:
+        if RobotFeature.DIFFERENTIAL_DRIVE in features:
             encoder_left: bool = RobotFeature.ENCODER_LEFT in features
             encoder_right: bool = RobotFeature.ENCODER_RIGHT in features
             self._wheels = DifferentialDriveWheels(robot_proto, key, encoder_left, encoder_right)
@@ -116,6 +116,20 @@ class RobotAbs:
     @property
     def pose(self) -> IPose3D:
         return self._pose
+
+    def time_of_flight(self, name: str) -> Optional[TimeOfFlight]:
+        tof_name = f"tof_{name}"
+        # make sure the feature exists
+        try:
+            feature = RobotFeature(tof_name)
+        except ValueError:
+            raise ValueError(f"Time-of-Flight feature '{name}' not recognized.")
+        # make sure the robot has this feature
+        if feature not in self._features:
+            raise ValueError(f"Robot {type(self).__name__} does not have the feature '{feature}'")
+        # return pointer to sensor object
+        tof_key = self._resource_key(tof_name)
+        return TimeOfFlight(self._protocol("robot"), tof_key)
 
     def _protocol(self, name: str):
         return self._protocols[name]
