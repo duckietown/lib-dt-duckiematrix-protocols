@@ -5,7 +5,6 @@ import numpy as np
 from dt_duckiematrix_protocols import Matrix
 
 viewer = Matrix("localhost", auto_commit=True)
-
 time.sleep(1)
 
 

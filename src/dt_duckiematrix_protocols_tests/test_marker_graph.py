@@ -5,8 +5,8 @@ from dt_duckiematrix_protocols import Matrix
 
 from dt_maps import Map
 
-map_dir = "/home/afdaniele/code/duckietown/distro/ente/dt-duckiematrix/assets/embedded_maps/TTIClargeloop"
-map = Map.from_disk("TTIClargeloop", map_dir)
+map_dir = "/home/afdaniele/code/duckietown/distro/ente/dt-duckiematrix/assets/embedded_maps/demo"
+map = Map.from_disk("demo", map_dir)
 
 viewer = Matrix("localhost", auto_commit=True)
 

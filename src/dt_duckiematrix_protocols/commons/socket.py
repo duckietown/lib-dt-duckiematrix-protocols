@@ -147,7 +147,7 @@ class DuckieMatrixEngineDataSocket(DuckieMatrixEngineSocketAbs):
         self._out_socket.send_multipart([key_raw, message_raw])
 
         # TODO: remove
-        print(f"PUBLISH: [{key}]: {message}")
+        # print(f"PUBLISH: [{key}]: {message}")
 
     def run(self) -> None:
         if self._in_socket is None:
