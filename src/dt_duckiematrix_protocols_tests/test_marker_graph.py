@@ -1,4 +1,5 @@
-import time
+import uuid
+
 import numpy as np
 
 from dt_duckiematrix_protocols import Matrix
@@ -10,10 +11,8 @@ map = Map.from_disk("demo", map_dir)
 
 viewer = Matrix("localhost", auto_commit=True)
 
-time.sleep(1)
-
 G = map.graph(2)
-
+markers = []
 
 with viewer.markers.atomic():
 
@@ -36,11 +35,17 @@ with viewer.markers.atomic():
         yaw = np.arctan2(vy-uy, vx-ux)
 
         arrow = viewer.markers.Arrow(
-            f"markers/{node_u_id}/{node_v_id}",
+            f"markers/{str(uuid.uuid4())}",
             x=ux, y=uy, z=0.0,
             scale=[0.02, 0.02, d * 0.95],
             yaw=yaw,
             color=[1.0, 1.0, 1.0, 0.2]
         )
+        markers.append(arrow)
 
-time.sleep(5)
+print("Markers placed, press ENTER to clean up and exit.")
+input()
+
+with viewer.markers.atomic():
+    for marker in markers:
+        marker.destroy()
