@@ -272,5 +272,5 @@ __all__ = [
     # Generic Robots
     "CameraEnabledRobot",
     "WheeledRobot",
-    "DifferentialDriveWheels"
+    "DifferentialDriveRobot"
 ]
