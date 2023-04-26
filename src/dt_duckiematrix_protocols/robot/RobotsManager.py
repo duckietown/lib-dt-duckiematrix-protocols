@@ -78,7 +78,8 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
-            RobotFeature.TOF_FRONT_CENTER
+            RobotFeature.TOF_FRONT_CENTER,
+            RobotFeature.LIGHTS_5,
         }
         return self._make_robot(key, DB21M, features, **kwargs)
 
@@ -88,7 +89,8 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
-            RobotFeature.TOF_FRONT_CENTER
+            RobotFeature.TOF_FRONT_CENTER,
+            RobotFeature.LIGHTS_5,
         }
         return self._make_robot(key, DB21J, features, **kwargs)
 
@@ -98,7 +100,8 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
-            RobotFeature.TOF_FRONT_CENTER
+            RobotFeature.TOF_FRONT_CENTER,
+            RobotFeature.LIGHTS_5,
         }
         return self._make_robot(key, DB21R, features, **kwargs)
 
@@ -108,6 +111,7 @@ class RobotsManager:
             RobotFeature.CAMERA_0,
             RobotFeature.ENCODER_LEFT,
             RobotFeature.ENCODER_RIGHT,
+            RobotFeature.LIGHTS_5,
         }
         return self._make_robot(key, DB19, features, **kwargs)
 
@@ -115,6 +119,7 @@ class RobotsManager:
         features: Set[RobotFeature] = {
             RobotFeature.DIFFERENTIAL_DRIVE,
             RobotFeature.CAMERA_0,
+            RobotFeature.LIGHTS_5,
         }
         return self._make_robot(key, DB18, features, **kwargs)
 

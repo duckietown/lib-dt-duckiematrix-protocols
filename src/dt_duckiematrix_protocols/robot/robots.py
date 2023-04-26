@@ -4,6 +4,7 @@ from typing import Optional, Dict, Set, Union, List
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.commons.ProtocolAbs import ProtocolAbs
 from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
+from dt_duckiematrix_protocols.robot.features.lights import Lights
 from dt_duckiematrix_protocols.robot.features.sensors import Camera, TimeOfFlight
 from dt_duckiematrix_protocols.robot.features.motion import DifferentialDrive, \
     DifferentialDriveWheels
@@ -19,7 +20,7 @@ from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 # DB20 = 12
 # DB21M = 13
 # DB21J = 14
-# DB21R = 15
+# DBR4 = 15
 # # Watchtower
 # WT18 = 20
 # WT19A = 21
@@ -52,11 +53,7 @@ class RobotFeature(Enum):
     # cameras
     CAMERA_0 = "camera_0"
     # lights
-    LIGHT_0 = "light_0"
-    LIGHT_1 = "light_1"
-    LIGHT_2 = "light_2"
-    LIGHT_3 = "light_3"
-    LIGHT_4 = "light_4"
+    LIGHTS_5 = "lights_5"
     # encoders
     ENCODER_LEFT = "encoder_left"
     ENCODER_RIGHT = "encoder_right"
@@ -109,6 +106,10 @@ class RobotAbs:
             encoder_left: bool = RobotFeature.ENCODER_LEFT in features
             encoder_right: bool = RobotFeature.ENCODER_RIGHT in features
             self._wheels = DifferentialDriveWheels(robot_proto, key, encoder_left, encoder_right)
+        # - lights
+        self._lights: Optional[Lights] = None
+        if RobotFeature.LIGHTS_5 in features:
+            self._lights = Lights(layer_proto, key)
 
     def session(self) -> ProtocolAbs.SessionProtocolContext:
         return self._protocol("robot").session()
@@ -167,9 +168,16 @@ class DifferentialDriveRobot(RobotAbs):
         return self._drive
 
 
+class LightsEnabledRobot(RobotAbs):
+
+    @property
+    def lights(self) -> Lights:
+        return self._lights
+
+
 # DB - Duckiebots
 
-class DBRobot(CameraEnabledRobot, WheeledRobot, DifferentialDriveRobot):
+class DBRobot(CameraEnabledRobot, WheeledRobot, DifferentialDriveRobot, LightsEnabledRobot):
     pass
 
 
