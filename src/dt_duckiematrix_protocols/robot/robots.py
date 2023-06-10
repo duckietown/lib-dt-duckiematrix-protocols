@@ -193,7 +193,7 @@ class DB21J(DB2XRobot):
     pass
 
 
-class DB21R(DB2XRobot):
+class DBR4(DB2XRobot):
     pass
 
 
@@ -264,7 +264,7 @@ __all__ = [
     "DBRobot",
     "DB21M",
     "DB21J",
-    "DB21R",
+    "DBR4",
     "DB19",
     "DB18",
     # Watchtowers

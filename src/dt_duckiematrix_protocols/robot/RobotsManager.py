@@ -3,7 +3,7 @@ from typing import Dict, Type, TypeVar, Optional, Set, Callable
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol
-from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature, DB21R, DB21J, \
+from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature, DBR4, DB21J, \
     WT18, WT19B, WT19A, WT21B, WT21A, DB18, DB19, DC21, CameraEnabledRobot, WheeledRobot, LightsEnabledRobot
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
@@ -34,7 +34,7 @@ class RobotsManager:
         self._robots_makers: Dict[str, Callable[[str, ...], RobotAbs]] = {
             "DB21M": self.DB21M,
             "DB21J": self.DB21J,
-            "DB21R": self.DB21R,
+            "DBR4": self.DBR4,
             "DB19": self.DB19,
             "DB18": self.DB18,
             "WT21A": self.WT21A,
@@ -94,7 +94,7 @@ class RobotsManager:
         }
         return self._make_robot(key, DB21J, features, **kwargs)
 
-    def DB21R(self, key: str, **kwargs) -> DB21R:
+    def DBR4(self, key: str, **kwargs) -> DBR4:
         features: Set[RobotFeature] = {
             RobotFeature.DIFFERENTIAL_DRIVE,
             RobotFeature.CAMERA_0,
@@ -103,7 +103,7 @@ class RobotsManager:
             RobotFeature.TOF_FRONT_CENTER,
             RobotFeature.LIGHTS_5,
         }
-        return self._make_robot(key, DB21R, features, **kwargs)
+        return self._make_robot(key, DBR4, features, **kwargs)
 
     def DB19(self, key: str, **kwargs) -> DB19:
         features: Set[RobotFeature] = {
