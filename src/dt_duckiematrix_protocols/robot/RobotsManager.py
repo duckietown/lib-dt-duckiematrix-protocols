@@ -4,7 +4,7 @@ from typing import Dict, Type, TypeVar, Optional, Set, Callable
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol
 from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature, DB21R, DB21J, \
-    WT18, WT19B, WT19A, WT21B, WT21A, DB18, DB19, DC21, CameraEnabledRobot, WheeledRobot
+    WT18, WT19B, WT19A, WT21B, WT21A, DB18, DB19, DC21, CameraEnabledRobot, WheeledRobot, LightsEnabledRobot
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
 T = TypeVar("T")
@@ -177,3 +177,9 @@ class RobotsManager:
                 RobotFeature.ENCODER_RIGHT,
             })
         return self._make_robot(key, WheeledRobot, features, **kwargs)
+
+    def LightsEnabledRobot(self, key: str, **kwargs) -> LightsEnabledRobot:
+        features: Set[RobotFeature] = {
+            RobotFeature.LIGHTS_5,
+        }
+        return self._make_robot(key, LightsEnabledRobot, features, **kwargs)
