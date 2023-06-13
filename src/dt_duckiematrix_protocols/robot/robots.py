@@ -174,6 +174,12 @@ class LightsEnabledRobot(RobotAbs):
     def lights(self) -> Lights:
         return self._lights
 
+class RangeEnabledRobot(RobotAbs):
+
+    @property
+    def time_of_flight(self) -> TimeOfFlight:
+        return self.time_of_flight
+
 
 # DB - Duckiebots
 
