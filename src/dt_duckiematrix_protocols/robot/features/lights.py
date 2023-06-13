@@ -93,7 +93,7 @@ class Lights:
 
     @property
     def all(self) -> LED:
-        return self._leds[0]
+        return self._all
 
     @property
     def light0(self) -> LED:
