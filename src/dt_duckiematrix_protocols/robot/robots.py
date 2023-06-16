@@ -7,7 +7,8 @@ from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.features.lights import Lights
 from dt_duckiematrix_protocols.robot.features.sensors import Camera, TimeOfFlight
 from dt_duckiematrix_protocols.robot.features.motion import DifferentialDrive, \
-    DifferentialDriveWheels
+    DifferentialDriveWheels,\
+    PWMDifferentialDrive
 from dt_duckiematrix_protocols.types.geometry import IPose3D
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
@@ -90,10 +91,13 @@ class RobotAbs:
             self._pose = Pose3D(self._protocol("layer"), key)
         # - differential drive
         self._drive: Optional[DifferentialDrive] = None
+        self._drive_pwm: Optional[PWMDifferentialDrive] = None
         if RobotFeature.DIFFERENTIAL_DRIVE in features:
             self._assert_protocols(RobotFeature.DIFFERENTIAL_DRIVE, ["robot"])
             wheels_key = self._resource_key("wheels")
+            pwm_wheels_key = self._resource_key("wheels/pwm")
             self._drive = DifferentialDrive(self._protocol("robot"), wheels_key)
+            self._drive_pwm = PWMDifferentialDrive(self._protocol("robot"), pwm_wheels_key)
         # - camera_0
         self._camera_0: Optional[Camera] = None
         if RobotFeature.CAMERA_0 in features:
@@ -166,6 +170,10 @@ class DifferentialDriveRobot(RobotAbs):
     @property
     def drive(self) -> DifferentialDrive:
         return self._drive
+    
+    @property
+    def drive_pwm(self) -> PWMDifferentialDrive:
+        return self._drive_pwm
 
 
 class LightsEnabledRobot(RobotAbs):

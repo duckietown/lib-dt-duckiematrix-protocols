@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 
-from dt_duckiematrix_messages.WheelsCommand import WheelsCommand
+from dt_duckiematrix_messages.WheelsCommand import WheelsCommand, PWMWheelsCommand
 from dt_duckiematrix_protocols.robot.RobotProtocols import RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.features.sensors import WheelEncoder
 
@@ -14,6 +14,20 @@ class DifferentialDrive:
 
     def __call__(self, left: float, right: float):
         message = WheelsCommand({
+            "left": left,
+            "right": right,
+        })
+        self._protocol.publish(self._key, message)
+
+class PWMDifferentialDrive:
+
+    def __init__(self, protocol: RobotProtocolAbs, key: str):
+        self._protocol = protocol
+        self._key = key
+
+    def __call__(self, left: float, right: float):
+        # TODO: assert that left, right belong to [-1,+1]
+        message = PWMWheelsCommand({
             "left": left,
             "right": right,
         })
