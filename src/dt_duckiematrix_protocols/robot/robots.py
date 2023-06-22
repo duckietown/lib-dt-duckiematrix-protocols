@@ -111,6 +111,12 @@ class RobotAbs:
         if RobotFeature.LIGHTS_5 in features:
             self._lights = Lights(layer_proto, key)
 
+        if RobotFeature.TOF_FRONT_CENTER in features:
+            tof_name = f"tof_front_center"
+
+            tof_key = self._resource_key(tof_name)
+            self._time_of_flight = TimeOfFlight(self._protocol("robot"), tof_key)
+
     def session(self) -> ProtocolAbs.SessionProtocolContext:
         return self._protocol("robot").session()
 
@@ -118,19 +124,6 @@ class RobotAbs:
     def pose(self) -> IPose3D:
         return self._pose
 
-    def time_of_flight(self, name: str) -> Optional[TimeOfFlight]:
-        tof_name = f"tof_{name}"
-        # make sure the feature exists
-        try:
-            feature = RobotFeature(tof_name)
-        except ValueError:
-            raise ValueError(f"Time-of-Flight feature '{name}' not recognized.")
-        # make sure the robot has this feature
-        if feature not in self._features:
-            raise ValueError(f"Robot {type(self).__name__} does not have the feature '{feature}'")
-        # return pointer to sensor object
-        tof_key = self._resource_key(tof_name)
-        return TimeOfFlight(self._protocol("robot"), tof_key)
 
     def _protocol(self, name: str):
         return self._protocols[name]
@@ -178,7 +171,7 @@ class RangeEnabledRobot(RobotAbs):
 
     @property
     def time_of_flight(self) -> TimeOfFlight:
-        return self.time_of_flight
+        return self._time_of_flight
 
 
 # DB - Duckiebots
