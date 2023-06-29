@@ -2,7 +2,7 @@ from threading import Semaphore
 from typing import Dict, Type, TypeVar, Optional, Set, Callable
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
-from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol
+from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol, RobotProtocolAbs
 from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature, DBR4, DB21J, \
     WT18, WT19B, WT19A, WT21B, WT21A, DB18, DB19, DC21, CameraEnabledRobot, WheeledRobot, \
     LightsEnabledRobot, RangeEnabledRobot
@@ -14,18 +14,17 @@ T = TypeVar("T")
 class RobotsManager:
 
     def __init__(self, engine_hostname: str, auto_commit: bool = False,
-                 robot_protocol: Optional[RealtimeRobotProtocol] = None,
+                 robot_protocol: Optional[RobotProtocolAbs] = None,
                  layer_protocol: Optional[LayerProtocol] = None):
         self._robots: Dict[str, RobotAbs] = {}
         # protocols
-        self._robot_protocol: Optional[RealtimeRobotProtocol] = None
+        self._robot_protocol: Optional[RobotProtocolAbs] = None
         self._layer_protocol: Optional[LayerProtocol] = None
         # robot protocol
         if robot_protocol is not None:
             self._robot_protocol = robot_protocol
         else:
-            self._robot_protocol: RealtimeRobotProtocol = RealtimeRobotProtocol(engine_hostname,
-                                                                                auto_commit)
+            self._robot_protocol: RobotProtocolAbs = RealtimeRobotProtocol(engine_hostname, auto_commit)
         # layer protocol
         if layer_protocol is not None:
             self._layer_protocol = layer_protocol
