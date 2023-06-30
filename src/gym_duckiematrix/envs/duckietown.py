@@ -1,5 +1,4 @@
-from ctypes import Union
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
