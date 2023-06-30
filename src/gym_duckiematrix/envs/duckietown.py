@@ -1,9 +1,10 @@
 from typing import Dict, List, Tuple, Union
 import gymnasium as gym
 from gymnasium import spaces
+from matplotlib import pyplot as plt
 import numpy as np
 from dt_duckiematrix_protocols import Matrix
-from dt_duckiematrix_protocols.robot.robots import DifferentialDriveRobot
+from dt_duckiematrix_protocols.robot.robots import DB2XRobot
 from turbojpeg import TurboJPEG
 
 DEFAULT_CAMERA_WIDTH = 640
@@ -39,8 +40,18 @@ class DuckietownEnv(gym.Env):
         self.observation_space = spaces.Tuple([base_observation_space]*len(self.entities))
 
         # create connection to the vehicle
-        self.robots : Tuple[DifferentialDriveRobot] = tuple(matrix.robots.DB21M(entity) for entity in self.entities)
-    
+        self.robots : Tuple[DB2XRobot] = tuple(matrix.robots.DB21M(entity) for entity in self.entities)
+        # create matplot window
+        camera_info: Dict[str, int] = {
+            "width": 640,
+            "height": 480
+        }
+        self.window = plt.imshow(np.zeros((camera_info["height"], camera_info["width"], 3)))
+        plt.axis("off")
+        self.fig = plt.figure(1)
+        plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
+        plt.pause(0.01)
+
     def step(self, actions : Union[List, Tuple]) -> Tuple[Tuple, Tuple, Tuple, Tuple]:
     
         """Stepping the environment
@@ -52,8 +63,12 @@ class DuckietownEnv(gym.Env):
         self.latest_actions = actions
         
         for robot, action in zip(self.robots, actions):
-            with robot.session():
-                robot.drive(left = action[0], right = action[1])
+            # Convert the action to a list (numpy array is not JSON serializable) 
+            action_list = action.tolist()
+
+            # Set the wheel speeds
+            robot.drive(left = action_list[0], right = action_list[1])
+
         obs = self._get_image_obs()
 
         terminated = truncated = False
@@ -63,17 +78,36 @@ class DuckietownEnv(gym.Env):
         return obs, reward, terminated, truncated, info        
     
     def reset(self):
-
+        
         for robot in self.robots:
-            robot.pose.x = np.random.uniform(-3, 3)
-            robot.pose.y = np.random.uniform(-3, 3)
-            robot.pose.yaw = np.random.uniform(-np.pi, np.pi)
-            robot.pose.update()
+            lights = [
+                    robot.lights.light0,
+                    robot.lights.light1,
+                    robot.lights.light3,
+                    robot.lights.light4,
+                ]
+
+            with robot.lights.atomic():
+                for light in lights:
+                    light.color.r = np.random.uniform(0.0, 1)
+                    light.color.g = np.random.uniform(0.9, 1)
+                    light.color.b = np.random.uniform(0.9, 1)
+            # 
+            # robot.pose.x = np.random.uniform(-3, 3)
+            # robot.pose.y = np.random.uniform(-3, 3)
+            # robot.pose.yaw = np.random.uniform(-np.pi, np.pi)
+            # robot.pose.update()
 
         return self._get_image_obs(), self._get_info()
             
     def render(self):
-        pass
+        for robot in self.robots:
+            rgb_imgs = self._get_image_obs()
+
+        # show frame
+        self.window.set_data(rgb_imgs[0])
+        self.fig.canvas.draw_idle()
+        self.fig.canvas.start_event_loop(0.00001)
     
     def close(self):
         pass
@@ -109,16 +143,7 @@ class DuckietownEnv(gym.Env):
 
         for robot, entity_name in zip(self.robots, self.entities):
             info[entity_name] = {
-                "position": {
-                    "x": robot.pose.x,
-                    "y": robot.pose.y,
-                    "z": robot.pose.z,
-                },
-                "orientation": {
-                    "roll": robot.pose.roll,
-                    "pitch": robot.pose.pitch,
-                    "yaw": robot.pose.yaw,
-                },
+                "position": None,
                 "velocity": None,
                 "angular_velocity": None,
                 "battery": None,
