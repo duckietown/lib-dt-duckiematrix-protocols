@@ -39,7 +39,7 @@ class DuckietownEnv(gym.Env):
         self.observation_space = spaces.Tuple([base_observation_space]*len(self.entities))
 
         # create connection to the vehicle
-        self.robots : Tuple[DifferentialDriveRobot] = (matrix.robots.DB21M(entity) for entity in self.entities)
+        self.robots : Tuple[DifferentialDriveRobot] = tuple(matrix.robots.DB21M(entity) for entity in self.entities)
     
     def step(self, actions : Union[List, Tuple]) -> Tuple[Tuple, Tuple, Tuple, Tuple]:
     
