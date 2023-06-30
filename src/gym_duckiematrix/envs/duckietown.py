@@ -132,9 +132,8 @@ class DuckietownEnv(gym.Env):
         rewards_dict = self._get_entities_rewards()
         return sum(rewards_dict.values())
     
-    def _get_entities_rewards(self) -> Dict[float]:
+    def _get_entities_rewards(self) -> Dict[str, float]:
         """Get the reward for each entity in the environment"""
         keys = self.entities
         values = [0.0] * len(self.entities)
-        rewards_dict : Dict[float] = dict(zip(keys, values))
-        return rewards_dict
+        return dict(zip(keys, values))
