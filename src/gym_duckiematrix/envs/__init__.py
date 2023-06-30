@@ -1,1 +1,1 @@
-from .duckiebot import DuckietownEnv
+from .duckietown import DuckietownEnv
