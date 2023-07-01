@@ -78,6 +78,7 @@ class DuckietownEnv(gym.Env):
     def close(self):
         pass
 
+    # TODO: [DTSW-3643] fix _get_image_obs returning a blank image
     def _get_image_obs(self) -> Tuple:
         """Get the observations for each robot in the environment
 
@@ -99,6 +100,7 @@ class DuckietownEnv(gym.Env):
 
         return tuple(rgb_images)
     
+    # TODO: [DTSW-3644] make _get_info return all matrix yaml files as dictionary
     def _get_info(self) -> Dict:
         """Get the info for each robot in the environment
 
@@ -126,7 +128,7 @@ class DuckietownEnv(gym.Env):
             }
         
         return info
-    
+    # TODO: [DTSW-3598]
     def _get_reward(self) -> float:
         """Get the reward for each robot in the environment"""
         rewards_dict = self._get_entities_rewards()
