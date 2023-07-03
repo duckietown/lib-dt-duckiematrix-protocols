@@ -14,7 +14,7 @@ class DuckietownEnv(gym.Env):
     
     jpeg = TurboJPEG()
 
-    def __init__(self, entities : Tuple = ('map_0/vehicle_0',), matrix_hostname : str = "localhost", **kwargs):
+    def __init__(self, entities : Tuple[DifferentialDriveRobot,...] = ('map_0/vehicle_0',), matrix_hostname : str = "localhost", **kwargs):
         """Duckietown environment for OpenAI Gym to control multiple robots in a single Duckiematrix environment.
 
         Args:
@@ -37,6 +37,8 @@ class DuckietownEnv(gym.Env):
             low=0, high=255, shape=(DEFAULT_CAMERA_HEIGHT, DEFAULT_CAMERA_WIDTH, 3), dtype=np.uint8
         )
         self.observation_space = spaces.Tuple([base_observation_space]*len(self.entities))
+
+        # TODO: [DTSW-3647] get entities a entities objects
 
         # create connection to the vehicle
         self.robots : Tuple[DifferentialDriveRobot] = tuple(matrix.robots.DB21M(entity) for entity in self.entities)
