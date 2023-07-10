@@ -23,3 +23,7 @@ sphinx
 sphinx-rtd-theme
 
 jupyter
+
+# Extra dependencies for gym environments
+# [gym]
+gymnasium
