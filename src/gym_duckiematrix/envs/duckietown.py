@@ -55,6 +55,7 @@ class DuckietownEnv(gym.Env):
         
         for robot, action in zip(self.robots, actions):
             with robot.session():
+                action = action.tolist()
                 robot.drive(left = action[0], right = action[1])
         obs = self._get_image_obs()
 
@@ -66,11 +67,11 @@ class DuckietownEnv(gym.Env):
     
     def reset(self):
 
-        for robot in self.robots:
-            robot.pose.x = np.random.uniform(-3, 3)
-            robot.pose.y = np.random.uniform(-3, 3)
-            robot.pose.yaw = np.random.uniform(-np.pi, np.pi)
-            robot.pose.update()
+        # for robot in self.robots:
+        #     robot.pose.x = np.random.uniform(-3, 3)
+        #     robot.pose.y = np.random.uniform(-3, 3)
+        #     robot.pose.yaw = np.random.uniform(-np.pi, np.pi)
+        #     robot.pose.update()
 
         return self._get_image_obs(), self._get_info()
             
@@ -111,23 +112,6 @@ class DuckietownEnv(gym.Env):
         """
         info : Dict = {}
 
-        for robot, entity_name in zip(self.robots, self.entities):
-            info[entity_name] = {
-                "position": {
-                    "x": robot.pose.x,
-                    "y": robot.pose.y,
-                    "z": robot.pose.z,
-                },
-                "orientation": {
-                    "roll": robot.pose.roll,
-                    "pitch": robot.pose.pitch,
-                    "yaw": robot.pose.yaw,
-                },
-                "velocity": None,
-                "angular_velocity": None,
-                "battery": None,
-                "ground_truth": None,
-            }
         
         return info
     # TODO: [DTSW-3598]
