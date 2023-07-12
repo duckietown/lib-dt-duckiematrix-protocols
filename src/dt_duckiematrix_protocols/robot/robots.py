@@ -76,7 +76,9 @@ class RobotAbs:
 
     def __init__(self, robot_proto: RobotProtocolAbs, key: str,
                  features: Set[RobotFeature],
-                 layer_proto: Optional[LayerProtocol] = None, **_):
+                 layer_proto: Optional[LayerProtocol] = None,
+                 auto_commit: bool = False,
+                 **_):
         self._key: str = key
         self._features: Set[RobotFeature] = features
         self._protocols: Dict[str, Union[None, LayerProtocol, RobotProtocolAbs]] = {
@@ -88,7 +90,7 @@ class RobotAbs:
         self._pose: Optional[IPose3D] = None
         if RobotFeature.FRAME in features:
             self._assert_protocols(RobotFeature.FRAME, ["layer"])
-            self._pose = Pose3D(self._protocol("layer"), key)
+            self._pose = Pose3D(self._protocol("layer"), key, auto_commit=auto_commit)
         # - differential drive
         self._drive: Optional[DifferentialDrive] = None
         self._drive_pwm: Optional[PWMDifferentialDrive] = None
@@ -127,7 +129,6 @@ class RobotAbs:
     @property
     def pose(self) -> IPose3D:
         return self._pose
-
 
     def _protocol(self, name: str):
         return self._protocols[name]
@@ -174,6 +175,7 @@ class LightsEnabledRobot(RobotAbs):
     @property
     def lights(self) -> Lights:
         return self._lights
+
 
 class RangeEnabledRobot(RobotAbs):
 

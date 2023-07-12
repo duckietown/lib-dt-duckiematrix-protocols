@@ -1,5 +1,5 @@
 from threading import Semaphore
-from typing import Dict, Type, TypeVar, Optional, Set, Callable
+from typing import Dict, Type, TypeVar, Optional, Set, Callable, Union
 
 from dt_duckiematrix_protocols.commons.LayerProtocol import LayerProtocol
 from dt_duckiematrix_protocols.robot.RobotProtocols import RealtimeRobotProtocol, RobotProtocolAbs
@@ -8,7 +8,7 @@ from dt_duckiematrix_protocols.robot.robots import RobotAbs, DB21M, RobotFeature
     LightsEnabledRobot, RangeEnabledRobot
 from dt_duckiematrix_protocols.utils.Pose3D import Pose3D
 
-T = TypeVar("T")
+RobotClass = TypeVar("RobotClass", bound=Union[RobotAbs])
 
 
 class RobotsManager:
@@ -16,6 +16,7 @@ class RobotsManager:
     def __init__(self, engine_hostname: str, auto_commit: bool = False,
                  robot_protocol: Optional[RobotProtocolAbs] = None,
                  layer_protocol: Optional[LayerProtocol] = None):
+        self._auto_commit: bool = auto_commit
         self._robots: Dict[str, RobotAbs] = {}
         # protocols
         self._robot_protocol: Optional[RobotProtocolAbs] = None
@@ -55,12 +56,13 @@ class RobotsManager:
     def _make_pose(self, key: str, **kwargs) -> Pose3D:
         return Pose3D(self._layer_protocol, key, **kwargs)
 
-    def _make_robot(self, key: str, factory: Type[T], features: Set[RobotFeature],
-                    raw_pose: bool = False, **kwargs) -> T:
+    def _make_robot(self, key: str, factory: Type[RobotClass], features: Set[RobotFeature],
+                    raw_pose: bool = False, **kwargs) -> RobotClass:
+        factory: Type[RobotAbs] = factory
         # expose raw 'frames' layer
         if raw_pose:
             features.add(RobotFeature.FRAME)
-        robot = factory(self._robot_protocol, key, features, self._layer_protocol, **kwargs)
+        robot = factory(self._robot_protocol, key, features, self._layer_protocol, self._auto_commit, **kwargs)
         # add robot
         self._add(key, robot)
         # ---

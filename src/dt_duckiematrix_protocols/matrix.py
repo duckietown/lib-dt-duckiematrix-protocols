@@ -30,6 +30,10 @@ class Matrix:
     def connected(self) -> bool:
         return self._robot_protocol.connected and self._layer_protocol.connected
 
+    @property
+    def layers(self) -> LayerProtocol:
+        return self._layer_protocol
+
     def wait_until_connected(self):
         self._robot_protocol.wait_until_connected()
         self._layer_protocol.wait_until_connected()
