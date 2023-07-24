@@ -14,7 +14,7 @@ class DuckietownEnv(gym.Env):
     
     jpeg = TurboJPEG()
 
-    def __init__(self, entities : Tuple[DifferentialDriveRobot,...] = ('map_0/vehicle_0',), matrix_hostname : str = "localhost", **kwargs):
+    def __init__(self, entities : Tuple[DifferentialDriveRobot,...] = ('map_0/vehicle_0',), matrix_hostname : str = "localhost", render_mode : str = 'rgb_array',**kwargs):
         """Duckietown environment for OpenAI Gym to control multiple robots in a single Duckiematrix environment.
 
         Args:
@@ -42,6 +42,18 @@ class DuckietownEnv(gym.Env):
         self.robots : Tuple[DifferentialDriveRobot] = tuple(
             matrix.robots.DB21M(entity) if entity is not DifferentialDriveRobot else entity for entity in self.entities
             )
+        
+        # Store render mode
+        self.render_mode = render_mode
+        if self.render_mode == 'human':
+            import matplotlib.pyplot as plt
+            # create matplot window
+            self.window = plt.imshow(np.zeros((DEFAULT_CAMERA_HEIGHT, DEFAULT_CAMERA_WIDTH, 3)))
+            plt.axis("off")
+            self.fig = plt.figure(1)
+            plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
+            plt.pause(0.01)
+
     
     def step(self, actions : Union[List, Tuple]) -> Tuple[Tuple, Tuple, Tuple, Tuple]:
     
@@ -63,6 +75,13 @@ class DuckietownEnv(gym.Env):
         info = self._get_info()
         reward = self._get_reward()
 
+        if self.render_mode == 'human':
+                rgb=self._get_image_obs()
+                # show frame
+                self.window.set_data(rgb[0])
+                self.fig.canvas.draw_idle()
+                self.fig.canvas.start_event_loop(0.00001)
+
         return obs, reward, terminated, truncated, info        
     
     def reset(self):
@@ -76,12 +95,16 @@ class DuckietownEnv(gym.Env):
         return self._get_image_obs(), self._get_info()
             
     def render(self):
+        if self.render_mode == 'rgb_array':
+            return self._get_image_obs()
+        elif self.render_mode == 'human':
+            return None
+
         pass
     
     def close(self):
         pass
 
-    # TODO: [DTSW-3643] fix _get_image_obs returning a blank image
     def _get_image_obs(self) -> Tuple:
         """Get the observations for each robot in the environment
 
